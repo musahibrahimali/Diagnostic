@@ -1,312 +1,190 @@
-# IMPORT PACKAGES AND MODULES
-# ///////////////////////////////////////////////////////////////
-from gui.uis.windows.main_window.functions_main_window import *
 import sys
 import os
-import time
-from PyQt5.QtWidgets import QApplication, QWidget, QPushButton, QProgressBar, QLabel, QFrame, QHBoxLayout, QVBoxLayout
-from PyQt5.QtCore import Qt, QTimer
+import sqlite3
 
-# IMPORT QT CORE
-# ///////////////////////////////////////////////////////////////
-from qt_core import *
-
-# IMPORT SETTINGS
-# ///////////////////////////////////////////////////////////////
-from gui.core.json_settings import Settings
-
-# IMPORT PY ONE DARK WINDOWS
-# ///////////////////////////////////////////////////////////////
-# MAIN WINDOW
-from gui.uis.windows.main_window import *
-
-# IMPORT PY ONE DARK WIDGETS
-# ///////////////////////////////////////////////////////////////
-from gui.widgets import *
-
-# ADJUST QT FONT DPI FOR HIGHT SCALE AN 4K MONITOR
-# ///////////////////////////////////////////////////////////////
-os.environ["QT_FONT_DPI"] = "96"
+# IMPORT MODULES
+from PySide6.QtGui import QGuiApplication, QIcon
+from PySide6.QtQml import QQmlApplicationEngine
+from PySide6.QtCore import QObject, Slot, Signal
 
 
-# IF IS 4K MONITOR ENABLE 'os.environ["QT_SCALE_FACTOR"] = "2"'
-
-# MAIN WINDOW
-# ///////////////////////////////////////////////////////////////
-class MainWindow(QMainWindow):
+# database handler class
+class DatabaseHandler(QObject):
     def __init__(self):
         super().__init__()
+        self.db = sqlite3.connect("database.db")
+        self.cursor = self.db.cursor()
 
-        # SETUP MAIN WINDOw
-        # Load widgets from "gui\uis\main_window\ui_main.py"
-        # ///////////////////////////////////////////////////////////////
-        self.ui = UIMainWindow()
-        self.ui.setup_ui(self)
+    # create table
+    def create_table(self):
+        # the users should have a unique username, so we use the UNIQUE
+        # keyword and a boolean with default as false for clinician
+        self.cursor.execute(
+            "CREATE TABLE IF NOT EXISTS users (fullname TEXT, email TEXT UNIQUE, password TEXT, isClinician BOOLEAN DEFAULT 0)"
+        )
 
-        # LOAD SETTINGS
-        # ///////////////////////////////////////////////////////////////
-        settings = Settings()
-        self.settings = settings.items
+    # register user
+    def register_user(self, fullname: str, email: str, password: str, isClinician: bool = False):
+        try:
+            self.cursor.execute(
+                "INSERT INTO users (fullname, email, password, isClinician) VALUES (?, ?, ?, ?)",
+                (fullname, email, password, isClinician),
+            )
+            self.db.commit()
+            return True
+        except sqlite3.IntegrityError:
+            return False
 
-        # SETUP MAIN WINDOW
-        # ///////////////////////////////////////////////////////////////
-        self.hide_grips = True  # Show/Hide resize grips
-        SetupMainWindow.setup_gui(self)
-
-        # SHOW MAIN WINDOW
-        # ///////////////////////////////////////////////////////////////
-        self.show()
-
-    # LEFT MENU BTN IS CLICKED
-    # Run function when btn is clicked
-    # Check funtion by object name / btn_id
-    # ///////////////////////////////////////////////////////////////
-    def btn_clicked(self):
-        # GET BT CLICKED
-        btn = SetupMainWindow.setup_btns(self)
-
-        # Remove Selection If Clicked By "btn_close_left_column"
-        if btn.objectName() != "btn_settings":
-            self.ui.left_menu.deselect_all_tab()
-
-        # Get Title Bar Btn And Reset Active
-        top_settings = MainFunctions.get_title_bar_btn(self, "btn_top_settings")
-        top_settings.set_active(False)
-
-        # LEFT MENU
-        # ///////////////////////////////////////////////////////////////
-
-        # HOME BTN
-        if btn.objectName() == "btn_home":
-            # Select Menu
-            self.ui.left_menu.select_only_one(btn.objectName())
-
-            # Load Page 1
-            MainFunctions.set_page(self, self.ui.load_pages.page_1)
-
-        # WIDGETS BTN
-        if btn.objectName() == "btn_widgets":
-            # Select Menu
-            self.ui.left_menu.select_only_one(btn.objectName())
-
-            # Load Page 2
-            MainFunctions.set_page(self, self.ui.load_pages.page_2)
-
-        # LOAD USER PAGE
-        if btn.objectName() == "btn_add_user":
-            # Select Menu
-            self.ui.left_menu.select_only_one(btn.objectName())
-
-            # Load Page 3
-            MainFunctions.set_page(self, self.ui.load_pages.page_3)
-
-        # BOTTOM INFORMATION
-        if btn.objectName() == "btn_info":
-            # CHECK IF LEFT COLUMN IS VISIBLE
-            if not MainFunctions.left_column_is_visible(self):
-                self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-                # Show / Hide
-                MainFunctions.toggle_left_column(self)
-                self.ui.left_menu.select_only_one_tab(btn.objectName())
-            else:
-                if btn.objectName() == "btn_close_left_column":
-                    self.ui.left_menu.deselect_all_tab()
-                    # Show / Hide
-                    MainFunctions.toggle_left_column(self)
-
-                self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-            # Change Left Column Menu
-            if btn.objectName() != "btn_close_left_column":
-                MainFunctions.set_left_column_menu(
-                    self,
-                    menu=self.ui.left_column.menus.menu_2,
-                    title="Info tab",
-                    icon_path=Functions.set_svg_icon("icon_info.svg")
-                )
-
-        # SETTINGS LEFT
-        if btn.objectName() == "btn_settings" or btn.objectName() == "btn_close_left_column":
-            # CHECK IF LEFT COLUMN IS VISIBLE
-            if not MainFunctions.left_column_is_visible(self):
-                # Show / Hide
-                MainFunctions.toggle_left_column(self)
-                self.ui.left_menu.select_only_one_tab(btn.objectName())
-            else:
-                if btn.objectName() == "btn_close_left_column":
-                    self.ui.left_menu.deselect_all_tab()
-                    # Show / Hide
-                    MainFunctions.toggle_left_column(self)
-                self.ui.left_menu.select_only_one_tab(btn.objectName())
-
-            # Change Left Column Menu
-            if btn.objectName() != "btn_close_left_column":
-                MainFunctions.set_left_column_menu(
-                    self,
-                    menu=self.ui.left_column.menus.menu_1,
-                    title="Settings Left Column",
-                    icon_path=Functions.set_svg_icon("icon_settings.svg")
-                )
-
-        # TITLE BAR MENU
-        # ///////////////////////////////////////////////////////////////
-
-        # SETTINGS TITLE BAR
-        if btn.objectName() == "btn_top_settings":
-            # Toogle Active
-            if not MainFunctions.right_column_is_visible(self):
-                btn.set_active(True)
-
-                # Show / Hide
-                MainFunctions.toggle_right_column(self)
-            else:
-                btn.set_active(False)
-
-                # Show / Hide
-                MainFunctions.toggle_right_column(self)
-
-            # Get Left Menu Btn
-            top_settings = MainFunctions.get_left_menu_btn(self, "btn_settings")
-            top_settings.set_active_tab(False)
-
-            # DEBUG
-        print(f"Button {btn.objectName()}, clicked!")
-
-    # LEFT MENU BTN IS RELEASED
-    # Run function when btn is released
-    # Check funtion by object name / btn_id
-    # ///////////////////////////////////////////////////////////////
-    def btn_released(self):
-        # GET BT CLICKED
-        btn = SetupMainWindow.setup_btns(self)
-
-        # DEBUG
-        print(f"Button {btn.objectName()}, released!")
-
-    # RESIZE EVENT
-    # ///////////////////////////////////////////////////////////////
-    def resizeEvent(self, event):
-        SetupMainWindow.resize_grips(self)
-
-    # MOUSE CLICK EVENTS
-    # ///////////////////////////////////////////////////////////////
-    def mousePressEvent(self, event):
-        # SET DRAG POS WINDOW
-        self.dragPos = event.globalPos()
+    # login user
+    def login_user(self, email: str, password: str):
+        self.cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
+        user = self.cursor.fetchone()
+        return user
 
 
-class SplashScreen(QWidget):
+# create the options window
+class MainWindow(QObject):
     def __init__(self):
-        super().__init__()
-        self.setWindowTitle('Welcome')
-        self.setFixedSize(500, 250)
-        self.setWindowFlag(Qt.FramelessWindowHint)
-        self.setAttribute(Qt.WA_TranslucentBackground)
+        QObject.__init__(self)
 
-        self.counter = 0
-        self.n = 300  # total instance
+        # create the database handler
+        self.db = DatabaseHandler()  # type: DatabaseHandler
+        self.db.create_table()  # create database table
+        self.isClinician = False
 
-        self.initUI()
+    # Static Info
+    staticPatient = "PATIENT"
+    staticClinician = "CLINICIAN"
+    patientSignal = Signal(str)
+    clinicianSignal = Signal(str)
+    signalChoice = Signal(bool)
 
-        self.timer = QTimer()
-        self.timer.timeout.connect(self.loading)
-        self.timer.start(30)
+    # login and register
+    staticOptLogin = "LOGIN"
+    staticOptRegister = "REGISTER"
+    optLoginSignal = Signal(str)
+    optRegisterSignal = Signal(str)
+    signalLoginRegister = Signal(bool)
 
-    def initUI(self):
-        layout = QVBoxLayout()
-        self.setLayout(layout)
+    # Static Info
+    staticUser = "musah"
+    staticPass = "123456"
 
-        self.frame = QFrame()
-        layout.addWidget(self.frame)
+    # Signals To Send Data
+    signalUser = Signal(str)
+    signalPass = Signal(str)
+    signalLogin = Signal(bool)
 
-        self.labelTitle = QLabel(self.frame)
-        self.labelTitle.setObjectName('LabelTitle')
+    # Signals To Send Data
+    signalFullName = Signal(str)
+    signalEmail = Signal(str)
+    signalPassword = Signal(str)
+    signalRegister = Signal(bool)
 
-        # center labels
-        self.labelTitle.resize(self.width() - 10, 100)
-        self.labelTitle.move(0, 10)  # x, y
-        self.labelTitle.setText('Welocme')
-        self.labelTitle.setAlignment(Qt.AlignCenter)
+    # function to handle the choice of patient or clinician
+    @Slot(str)
+    def patientClinician(self, getPatientClinician):
+        if self.staticPatient.lower() == getPatientClinician.lower():
+            self.isClinician = False
+            # send patient signal
+            self.patientSignal.emit("Patient")
+            # send patient clinician signal
+            self.signalChoice.emit(True)
+            print(f"Patient passed! {getPatientClinician}, isClinician {self.isClinician}")
+        elif self.staticClinician.lower() == getPatientClinician.lower():
+            self.isClinician = True
+            # send clinician signal
+            self.clinicianSignal.emit("Clinician")
+            # send patient clinician signal
+            self.signalChoice.emit(True)
+            print(f"Clinician passed! {getPatientClinician}, isClinician {self.isClinician}")
+        else:
+            self.onSignalChoice.emit(False)
+            print("Patient/Clinician error!")
 
-        self.labelDescription = QLabel(self.frame)
-        self.labelDescription.resize(self.width() - 10, 50)
-        self.labelDescription.move(0, self.labelTitle.height())
+    # function to handle the choice of login or register
+    @Slot(str)
+    def loginRegister(self, getLoginRegister):
+        if self.staticOptLogin.lower() == getLoginRegister.lower():
+            # send login signal
+            self.optLoginSignal.emit("Login")
+            # send login register signal
+            self.signalLoginRegister.emit(True)
+            print(f"Login pressed! {getLoginRegister}")
+        elif self.staticOptRegister.lower() == getLoginRegister.lower():
+            # send register signal
+            self.optRegisterSignal.emit("Register")
+            # send login register signal
+            self.signalLoginRegister.emit(False)
+            print(f"Register pressed! {getLoginRegister}")
+        else:
+            print("Login/Register error!")
 
-        self.progressBar = QProgressBar(self.frame)
-        self.progressBar.resize(self.width() - 100, 30)
-        self.progressBar.move(40, self.labelDescription.y() + 40)
-        self.progressBar.setAlignment(Qt.AlignCenter)
-        self.progressBar.setFormat('%p%')
-        self.progressBar.setTextVisible(True)
-        self.progressBar.setRange(0, self.n)
-        self.progressBar.setValue(30)
+    # Function To Check Login
+    @Slot(str, str)
+    def checkLogin(self, getUser, getPass):
+        # if the getUser and getPass are not empty
+        if getUser != "" and getPass != "":
+            # Send User And Pass
+            self.signalUser.emit(getUser)
+            self.signalPass.emit(getPass)
+            user = self.db.login_user(getUser, getPass)
+            print(f"the user is {user}")
+            if user is not None:
+                if self.isClinician and user[3]:
+                    self.signalLogin.emit(True)
+                    print("Login successful!")
+                else:
+                    self.signalLogin.emit(False)
+                    print("Login failed!")
+        else:
+            self.signalLogin.emit(False)
+            print("Login error!")
 
-    def loading(self):
-        self.progressBar.setValue(self.counter)
+    # Function To Check Register
+    @Slot(str, str, str)
+    def checkRegister(self, getFullName, getEmail, getPass):
+        # add the user to the database if the fields are not empty
+        if getFullName != "" and getEmail != "" and getPass != "":
+            # make sure email is valid and password is not too short
+            if "@" in getEmail and len(getPass) >= 6 and len(getFullName) >= 3:
+                # send the data to the database
+                self.signalFullName.emit(getFullName)
+                self.signalEmail.emit(getEmail)
+                self.signalPassword.emit(getPass)
+                # register the user in the database
+                _isRegister = self.db.register_user(getFullName, getEmail, getPass, self.isClinician)
+                if _isRegister:
+                    self.signalRegister.emit(True)
+                else:
+                    self.signalRegister.emit(False)
+            else:
+                self.signalRegister.emit(False)
+                # print(f"Register Successful! {getFullName} {getEmail} {getPass}")
+        else:
+            print("Register Unsuccessful!")
 
-        if self.counter >= self.n:
-            self.timer.stop()
-            self.close()
 
-            time.sleep(1)
+def start_app() -> None:
+    # start the application engine
+    app = QGuiApplication(sys.argv)
+    app.setWindowIcon(QIcon("./images/logo.png"))
+    engine = QQmlApplicationEngine()
 
-            self.myApp = MainWindow()
-            self.myApp.show()
+    # get context
+    main = MainWindow()
+    engine.rootContext().setContextProperty("patientClinicianBackend", main)
+    engine.rootContext().setContextProperty("loginBackend", main)
+    engine.rootContext().setContextProperty("registerBackend", main)
 
-        self.counter += 1
+    # load the QML file
+    engine.load(os.path.join(os.path.dirname(__file__), "qml/options.qml"))
+
+    # check if the application is running
+    if not engine.rootObjects():
+        sys.exit(-1)
+    sys.exit(app.exec())
 
 
-# SETTINGS WHEN TO START
-# Set the initial class and also additional parameters of the "QApplication" class
-# ///////////////////////////////////////////////////////////////
 if __name__ == "__main__":
-
-    app = QApplication(sys.argv)
-    app.setStyleSheet('''
-            #LabelTitle {
-                font-size: 60px;
-                color:#55ffff;
-            }
-
-            #LabelDesc {
-                font-size: 30px;
-                color: #c2ced1;
-            }
-
-            #LabelLoading {
-                font-size: 30px;
-                color: #e8e8eb;
-            }
-
-            QFrame {
-                background-color: #1a2127;
-                color: rgb(220, 220, 220);
-            }
-
-            QProgressBar {
-                background-color: #1a2127;
-                border:  rgb(41, 52, 61);
-                color:  #fff;
-                border-radius: 5px;
-                text-align: center;
-                text-align: center;
-                font-size: 30px;                
-            }
-
-            QProgressBar::chunk {
-                background-color:  qlineargradient(
-                    spread:pad, x1:0, y1:0.5, x2:1, y2:0.466, stop:0 rgba(9, 27, 27, 255), stop:1 rgba(85, 255, 255, 255)
-                );
-                color: #fff;
-                border-radius: 5px;
-            }
-        ''')
-
-    splash = SplashScreen()
-    splash.show()
-
-    try:
-        sys.exit(app.exec())
-    except SystemExit:
-        pass
+    start_app()
