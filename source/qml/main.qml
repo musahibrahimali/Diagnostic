@@ -5,7 +5,7 @@ import QtQuick.Controls.Material 2.15
 
 ApplicationWindow{
     id: window
-    width: 760
+    width: 550
     height: 500
     visible: true
     title: qsTr("JIJ DIAGNOSTIC")
@@ -22,32 +22,66 @@ ApplicationWindow{
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.verticalCenter: parent.verticalCenter
 
-        // add a progress indicator
-        ProgressIndicator {
-            id: progressIndicator
-            running: true
-            visible: true
-            width: 150
-            height: 50
-            anchors.horizontalCenter: parent.horizontalCenter
-            anchors.verticalCenter: parent.verticalCenter
-        }
-
         // add a row
         Row {
+            id: playAndStopRow
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
             spacing: 10
             // add a button
             Button {
                 text: "Record"
-                onClicked: console.log("Button 1 clicked")
+                width: 150
+                onClicked: mainBackend.recordStopDeletePlay("RECORD")
             }
             // add a button
             Button {
                 text: "Stop"
-                onClicked: console.log("Button 2 clicked")
+                width: 150
+                onClicked: mainBackend.recordStopDeletePlay("STOP")
             }
+        }
+
+        Row {
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            anchors.margins: 10
+            anchors.top: playAndStopRow.bottom
+            spacing: 10
+            // add a button
+            Button {
+                text: "Play"
+                width: 150
+                onClicked: mainBackend.recordStopDeletePlay("PLAY")
+            }
+            // add a button
+            Button {
+                text: "Delete"
+                width: 150
+                onClicked: mainBackend.recordStopDeletePlay("DELETE")
+            }
+        }
+
+    }
+
+    Connections {
+        target: mainBackend
+
+        // FUNTION OPEN NEW WINDOW (APP WINDOW)
+        function onSignalRecord(boolValue) {
+
+        }
+
+        function onSignalStop(boolValue) {
+
+        }
+
+        function onSignalPlay(boolValue) {
+
+        }
+
+        function onSignalDelete(boolValue) {
+
         }
     }
 }

@@ -81,6 +81,24 @@ class MainWindow(QObject):
     signalPassword = Signal(str)
     signalRegister = Signal(bool)
 
+    # static for record, stop, delete, play
+    staticRecord = "RECORD"
+    staticStop = "STOP"
+    staticDelete = "DELETE"
+    staticPlay = "PLAY"
+
+    # signals for record, stop, delete, play
+    recordSignal = Signal(str)
+    stopSignal = Signal(str)
+    deleteSignal = Signal(str)
+    playSignal = Signal(str)
+
+    # onSignal for record, stop, delete, play
+    signalPlay = Signal(bool)
+    signalStop = Signal(bool)
+    signalDelete = Signal(bool)
+    signalRecord = Signal(bool)
+
     # function to handle the choice of patient or clinician
     @Slot(str)
     def patientClinician(self, getPatientClinician):
@@ -164,6 +182,36 @@ class MainWindow(QObject):
         else:
             print("Register Unsuccessful!")
 
+    # function to handle the record, stop, delete, play
+    @Slot(str)
+    def recordStopDeletePlay(self, getRecordStopDeletePlay):
+        if self.staticRecord.lower() == getRecordStopDeletePlay.lower():
+            # send record signal
+            self.recordSignal.emit("Record")
+            # send record signal
+            self.signalRecord.emit(True)
+            print(f"Record pressed! {getRecordStopDeletePlay}")
+        elif self.staticStop.lower() == getRecordStopDeletePlay.lower():
+            # send stop signal
+            self.stopSignal.emit("Stop")
+            # send stop signal
+            self.signalStop.emit(True)
+            print(f"Stop pressed! {getRecordStopDeletePlay}")
+        elif self.staticDelete.lower() == getRecordStopDeletePlay.lower():
+            # send delete signal
+            self.deleteSignal.emit("Delete")
+            # send delete signal
+            self.signalDelete.emit(True)
+            print(f"Delete pressed! {getRecordStopDeletePlay}")
+        elif self.staticPlay.lower() == getRecordStopDeletePlay.lower():
+            # send play signal
+            self.playSignal.emit("Play")
+            # send play signal
+            self.signalPlay.emit(True)
+            print(f"Play pressed! {getRecordStopDeletePlay}")
+        else:
+            print("Record/Stop/Delete/Play error!")
+
 
 def start_app() -> None:
     # start the application engine
@@ -173,9 +221,11 @@ def start_app() -> None:
 
     # get context
     main = MainWindow()
+    # backend connections to frontend
     engine.rootContext().setContextProperty("patientClinicianBackend", main)
     engine.rootContext().setContextProperty("loginBackend", main)
     engine.rootContext().setContextProperty("registerBackend", main)
+    engine.rootContext().setContextProperty("mainBackend", main)
 
     # load the QML file
     engine.load(os.path.join(os.path.dirname(__file__), "qml/options.qml"))
