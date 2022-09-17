@@ -1,45 +1,11 @@
 import sys
 import os
-import sqlite3
 
 # IMPORT MODULES
 from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtCore import QObject, Slot, Signal
-
-
-# database handler class
-class DatabaseHandler(QObject):
-    def __init__(self):
-        super().__init__()
-        self.db = sqlite3.connect("database.db")
-        self.cursor = self.db.cursor()
-
-    # create table
-    def create_table(self):
-        # the users should have a unique username, so we use the UNIQUE
-        # keyword and a boolean with default as false for clinician
-        self.cursor.execute(
-            "CREATE TABLE IF NOT EXISTS users (fullname TEXT, email TEXT UNIQUE, password TEXT, isClinician BOOLEAN DEFAULT 0)"
-        )
-
-    # register user
-    def register_user(self, fullname: str, email: str, password: str, isClinician: bool = False):
-        try:
-            self.cursor.execute(
-                "INSERT INTO users (fullname, email, password, isClinician) VALUES (?, ?, ?, ?)",
-                (fullname, email, password, isClinician),
-            )
-            self.db.commit()
-            return True
-        except sqlite3.IntegrityError:
-            return False
-
-    # login user
-    def login_user(self, email: str, password: str):
-        self.cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))
-        user = self.cursor.fetchone()
-        return user
+from utils import database
 
 
 # create the options window
@@ -48,7 +14,7 @@ class MainWindow(QObject):
         QObject.__init__(self)
 
         # create the database handler
-        self.db = DatabaseHandler()  # type: DatabaseHandler
+        self.db = database.DatabaseHandler()  # type: database.DatabaseHandler
         self.db.create_table()  # create database table
         self.isClinician = False
 
@@ -66,11 +32,7 @@ class MainWindow(QObject):
     optRegisterSignal = Signal(str)
     signalLoginRegister = Signal(bool)
 
-    # Static Info
-    staticUser = "musah"
-    staticPass = "123456"
-
-    # Signals To Send Data
+    # Signals To log in
     signalUser = Signal(str)
     signalPass = Signal(str)
     signalLogin = Signal(bool)
@@ -84,8 +46,6 @@ class MainWindow(QObject):
     # static for record, stop, delete, play
     staticRecord = "RECORD"
     staticStop = "STOP"
-    staticDelete = "DELETE"
-    staticPlay = "PLAY"
 
     # signals for record, stop, delete, play
     recordSignal = Signal(str)
@@ -149,12 +109,8 @@ class MainWindow(QObject):
             user = self.db.login_user(getUser, getPass)
             print(f"the user is {user}")
             if user is not None:
-                if self.isClinician and user[3]:
-                    self.signalLogin.emit(True)
-                    print("Login successful!")
-                else:
-                    self.signalLogin.emit(False)
-                    print("Login failed!")
+                self.signalLogin.emit(True)
+                print("Login successful!")
         else:
             self.signalLogin.emit(False)
             print("Login error!")
