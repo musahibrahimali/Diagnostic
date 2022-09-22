@@ -16,7 +16,7 @@ ApplicationWindow{
 
     Rectangle {
         id: recordStopContent
-        visible: false
+        visible: true
         x: 10
         y: 10
         width: parent.width-20
@@ -26,6 +26,7 @@ ApplicationWindow{
         color: Material.color(Material.Grey, Material.Shade900)
 
         Column{
+            id: recordStopColumn
             anchors.margins: 10
             visible: true
             anchors.horizontalCenter: parent.horizontalCenter
@@ -48,6 +49,63 @@ ApplicationWindow{
                         width: 150
                         onClicked: mainBackend.recordStopDeletePlay("STOP")
                     }
+            }
+        }
+
+        Column{
+            id: recordingAudioColumn
+            anchors.margins: 10
+            visible: false
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            // add a text
+            Text {
+                id: recordingAudioText
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                text: "Recording audio..."
+                color: Material.color(Material.Grey, Material.Shade100)
+            }
+        }
+
+        // show the two graphs
+        Column{
+            id: graphColumn
+            anchors.margins: 10
+            visible: false
+            anchors.horizontalCenter: parent.horizontalCenter
+            anchors.verticalCenter: parent.verticalCenter
+            // add a row
+            Row {
+                    id: graphRow
+                    anchors.horizontalCenter: parent.horizontalCenter
+                    anchors.verticalCenter: parent.verticalCenter
+                    spacing: 10
+                    // show an image
+                    Image {
+                        id: rawGraphImage
+                        width: 350
+                        height: 300
+                        source: "../images/logo.png"
+                    }
+
+                    // show an image
+                    Image {
+                        id: medFiltGraphImage
+                        width: 350
+                        height: 300
+                        source: "../images/logo.png"
+                    }
+            }
+
+            // add a button to proceed
+            Button {
+                id: proceedButton
+                anchors.top: graphRow.bottom
+                anchors.topMargin: 30
+                text: "Proceed"
+                width: 150
+                onClicked: mainBackend.proceedToQuestions()
             }
         }
     }
@@ -80,7 +138,6 @@ ApplicationWindow{
 
             Row{
                 id:questionOneOptions
-//                    anchors.margins: 10
                 anchors.topMargin: 30
                 anchors.rightMargin: 10
                 spacing: 10
@@ -214,11 +271,31 @@ ApplicationWindow{
             }
         }
 
+        Column{
+            id: submitButtonColumn
+            anchors.margins: 10
+            anchors.topMargin: 80
+            spacing: 10
+            anchors.top: questionThree.bottom
+            anchors.horizontalCenter: parent.horizontalCenter
+            // add a button to proceed
+            Button {
+                id: submitButton
+                anchors.horizontalCenter: parent.horizontalCenter
+                anchors.verticalCenter: parent.verticalCenter
+                anchors.topMargin: 20
+                text: "Submit"
+                width: 150
+                onClicked: mainBackend.submitQuestions()
+            }
+        }
+
     }
 
     // results column
     Rectangle {
-        visible: true
+        id: resultsContainer
+        visible: false
         x: 10
         y: 10
         width: parent.width-20
@@ -258,11 +335,58 @@ ApplicationWindow{
 
         // FUNTION OPEN NEW WINDOW (APP WINDOW)
         function onSignalRecord(boolValue) {
-
+            if (boolValue) {
+                // hide the record stop button
+                recordStopColumn.visible = false
+                recordingAudioColumn.visible = true
+           }else{
+                // hide the record stop button
+                recordStopColumn.visible = false
+                recordingAudioColumn.visible = false
+                graphColumn.visible = true
+                // change the window width to 800
+                window.width = 800
+                window.height = 600
+                // change the image fo the rawGraphImage
+                rawGraphImage.source = "../sound_wave.png"
+                medFiltGraphImage.source = "../envelope.png"
+           }
         }
 
         function onSignalStop(boolValue) {
+            if (boolValue) {
+                // hide the record stop button
+                recordStopColumn.visible = true
+                recordingAudioColumn.visible = false
+           }
+        }
 
+        function onSignalProceed(boolValue){
+            if(boolValue){
+                // hide the record stop button
+                recordStopColumn.visible = false
+                recordingAudioColumn.visible = false
+                graphColumn.visible = false
+                // change the window width to 800
+                window.width = 850
+                window.height = 600
+                // show the questions
+                questionaireContainer.visible = true
+            }
+        }
+
+        function onSignalSubmit(boolValue){
+            if(boolValue){
+                // hide the record stop button
+                recordStopColumn.visible = false
+                recordingAudioColumn.visible = false
+                graphColumn.visible = false
+                questionaireContainer.visible = false
+                window.width = 800
+                window.height = 600
+                // show the results
+                resultsContainer.visible = true
+            }
         }
     }
 }

@@ -6,6 +6,8 @@ from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
 from PySide6.QtCore import QObject, Slot, Signal
 from utils import database
+from utils import voice_recorder
+from tensorflow.keras.models import load_model
 
 
 # create the options window
@@ -54,10 +56,11 @@ class MainWindow(QObject):
     playSignal = Signal(str)
 
     # onSignal for record, stop, delete, play
-    signalPlay = Signal(bool)
-    signalStop = Signal(bool)
-    signalDelete = Signal(bool)
     signalRecord = Signal(bool)
+    signalStop = Signal(bool)
+
+    signalProceed = Signal(bool)
+    signalSubmit = Signal(bool)
 
     # function to handle the choice of patient or clinician
     @Slot(str)
@@ -68,17 +71,17 @@ class MainWindow(QObject):
             self.patientSignal.emit("Patient")
             # send patient clinician signal
             self.signalChoice.emit(True)
-            print(f"Patient passed! {getPatientClinician}, isClinician {self.isClinician}")
+            # print(f"Patient passed! {getPatientClinician}, isClinician {self.isClinician}")
         elif self.staticClinician.lower() == getPatientClinician.lower():
             self.isClinician = True
             # send clinician signal
             self.clinicianSignal.emit("Clinician")
             # send patient clinician signal
             self.signalChoice.emit(True)
-            print(f"Clinician passed! {getPatientClinician}, isClinician {self.isClinician}")
+            # print(f"Clinician passed! {getPatientClinician}, isClinician {self.isClinician}")
         else:
             self.onSignalChoice.emit(False)
-            print("Patient/Clinician error!")
+            # print("Patient/Clinician error!")
 
     # function to handle the choice of login or register
     @Slot(str)
@@ -88,15 +91,16 @@ class MainWindow(QObject):
             self.optLoginSignal.emit("Login")
             # send login register signal
             self.signalLoginRegister.emit(True)
-            print(f"Login pressed! {getLoginRegister}")
+            # print(f"Login pressed! {getLoginRegister}")
         elif self.staticOptRegister.lower() == getLoginRegister.lower():
             # send register signal
             self.optRegisterSignal.emit("Register")
             # send login register signal
             self.signalLoginRegister.emit(False)
-            print(f"Register pressed! {getLoginRegister}")
+            # print(f"Register pressed! {getLoginRegister}")
         else:
-            print("Login/Register error!")
+            pass
+            # print("Login/Register error!")
 
     # Function To Check Login
     @Slot(str, str)
@@ -107,13 +111,13 @@ class MainWindow(QObject):
             self.signalUser.emit(getUser)
             self.signalPass.emit(getPass)
             user = self.db.login_user(getUser, getPass)
-            print(f"the user is {user}")
+            # print(f"the user is {user}")
             if user is not None:
                 self.signalLogin.emit(True)
-                print("Login successful!")
+                # print("Login successful!")
         else:
             self.signalLogin.emit(False)
-            print("Login error!")
+            # print("Login error!")
 
     # Function To Check Register
     @Slot(str, str, str)
@@ -136,7 +140,8 @@ class MainWindow(QObject):
                 self.signalRegister.emit(False)
                 # print(f"Register Successful! {getFullName} {getEmail} {getPass}")
         else:
-            print("Register Unsuccessful!")
+            pass
+            # print("Register Unsuccessful!")
 
     # function to handle the record, stop, delete, play
     @Slot(str)
@@ -146,6 +151,10 @@ class MainWindow(QObject):
             self.recordSignal.emit("Record")
             # send record signal
             self.signalRecord.emit(True)
+            # record audio
+            _isRecorded = voice_recorder.record_audio()
+            if os.path.exists("./rec.wav"):
+                self.signalRecord.emit(False)
             print(f"Record pressed! {getRecordStopDeletePlay}")
         elif self.staticStop.lower() == getRecordStopDeletePlay.lower():
             # send stop signal
@@ -153,20 +162,24 @@ class MainWindow(QObject):
             # send stop signal
             self.signalStop.emit(True)
             print(f"Stop pressed! {getRecordStopDeletePlay}")
-        elif self.staticDelete.lower() == getRecordStopDeletePlay.lower():
-            # send delete signal
-            self.deleteSignal.emit("Delete")
-            # send delete signal
-            self.signalDelete.emit(True)
-            print(f"Delete pressed! {getRecordStopDeletePlay}")
-        elif self.staticPlay.lower() == getRecordStopDeletePlay.lower():
-            # send play signal
-            self.playSignal.emit("Play")
-            # send play signal
-            self.signalPlay.emit(True)
-            print(f"Play pressed! {getRecordStopDeletePlay}")
         else:
-            print("Record/Stop/Delete/Play error!")
+            # send stop signal
+            self.signalStop.emit(True)
+            print("Record/Stop error!")
+
+    # function to handle the proceed button
+    @Slot()
+    def proceedToQuestions(self):
+        # send proceed signal
+        self.signalProceed.emit(True)
+        print("Proceed pressed!")
+
+    # function to handle the submit button
+    @Slot()
+    def submitQuestions(self):
+        # send submit signal
+        self.signalSubmit.emit(True)
+        print("Submit pressed!")
 
 
 def start_app() -> None:
