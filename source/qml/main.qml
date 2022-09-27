@@ -14,6 +14,12 @@ ApplicationWindow{
     Material.theme: Material.Dark
     Material.accent: Material.LightBlue
 
+    // CUSTOM PROPERTIES
+    property string durtion: "Duration : "
+    property string voidedVolume: "Voided Volume : "
+    property string urineFlowRate: "Urine Flow Rate : "
+    property string usg: "USG : "
+
     Rectangle {
         id: recordStopContent
         visible: true
@@ -58,13 +64,9 @@ ApplicationWindow{
             visible: false
             anchors.horizontalCenter: parent.horizontalCenter
             anchors.verticalCenter: parent.verticalCenter
-            // add a text
-            Text {
-                id: recordingAudioText
-                anchors.horizontalCenter: parent.horizontalCenter
-                anchors.verticalCenter: parent.verticalCenter
-                text: "Recording audio..."
-                color: Material.color(Material.Grey, Material.Shade100)
+            ProgressBar {
+                id: progressBar
+                indeterminate: true
             }
         }
 
@@ -98,11 +100,49 @@ ApplicationWindow{
                     }
             }
 
+            Row{
+                id: valuesColumn
+                anchors.top: graphRow.bottom
+                spacing: 50
+                anchors.topMargin: 30
+                // add a text
+                Text {
+                    id: durationText
+                    anchors.left: parent.left
+                    anchors.leftMargin: 10
+                    text: duration
+                    color: Material.color(Material.Grey, Material.Shade100)
+                }
+                // add the voided volume text
+                Text {
+                    id: voidedVolumeText
+                    anchors.left: durationText.right
+                    text: voidedVolume
+                    color: Material.color(Material.Grey, Material.Shade100)
+                }
+
+                // add the urine flow rate text
+                Text {
+                    id: urineFlowRateText
+                    anchors.left: voidedVolumeText.right
+                    text: urineFlowRate
+                    color: Material.color(Material.Grey, Material.Shade100)
+                }
+
+                // add the usg text
+                Text {
+                    id: usgText
+                    anchors.left: urineFlowRateText.right
+                    text: usg
+                    color: Material.color(Material.Grey, Material.Shade100)
+                }
+            }
+
             // add a button to proceed
             Button {
                 id: proceedButton
                 anchors.top: graphRow.bottom
-                anchors.topMargin: 30
+                anchors.topMargin: 70
                 text: "Proceed"
                 width: 150
                 onClicked: mainBackend.proceedToQuestions()
@@ -332,7 +372,6 @@ ApplicationWindow{
 
     Connections {
         target: mainBackend
-
         // FUNTION OPEN NEW WINDOW (APP WINDOW)
         function onSignalRecord(boolValue) {
             if (boolValue) {
@@ -349,7 +388,7 @@ ApplicationWindow{
                 window.height = 600
                 // change the image fo the rawGraphImage
                 rawGraphImage.source = "../sound_wave.png"
-                medFiltGraphImage.source = "../envelope.png"
+                medFiltGraphImage.source = "../med_filter.png"
            }
         }
 

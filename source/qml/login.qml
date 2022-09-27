@@ -47,7 +47,7 @@ ApplicationWindow{
         id: image
         width: 300
         height: 120
-        source: "../images/logo.png"
+        source: "../images/icon.svg"
         anchors.horizontalCenter: parent.horizontalCenter
         anchors.top: topBar.bottom
         anchors.topMargin: 60

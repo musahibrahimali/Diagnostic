@@ -21,7 +21,7 @@ from scipy.interpolate import make_interp_spline, BSpline
 from mutagen.mp3 import MP3
 
 
-def open_audio(path: str, mp3: bool = True):
+def open_audio(path: str, mp3: bool = True) -> any:
     audio = wave.open(path)
 
     # Get frame rate
@@ -45,7 +45,7 @@ def open_audio(path: str, mp3: bool = True):
     return time_range, sig, fs, duration
 
 
-def frequency_analysis(sig, fs):
+def frequency_analysis(sig, fs) -> any:
     global time
 
     # Get values for fourier transform
@@ -57,7 +57,7 @@ def frequency_analysis(sig, fs):
 
 
 # %%
-def get_envelopes(time_range, s, dmin=1, dmax=1, split=False, top_env=True, smoothening=1500):
+def get_envelopes(time_range, s, dmin=1, dmax=1, split=False, top_env=True, smoothening=1500) -> any:
     lmin = (np.diff(np.sign(np.diff(s))) > 0).nonzero()[0] + 1
     # locals max
     lmax = (np.diff(np.sign(np.diff(s))) < 0).nonzero()[0] + 1
@@ -90,37 +90,37 @@ def get_envelopes(time_range, s, dmin=1, dmax=1, split=False, top_env=True, smoo
     return xnew, ynew
 
 
-def area_under_plot(f_data):
+def area_under_plot(f_data) -> any:
     return np.trapz(f_data, dx=1)
 
 
-def flow_rate(f_data):
+def flow_rate(f_data) -> any:
     return np.tranz(f_data, dx=1)
 
 
-def Usg(f_data):
+def Usg(f_data) -> any:
     return np.tranz(f_data, dx=1)
 
 
-def Vol(f_data):
+def Vol(f_data) -> any:
     return np.tranz(f_data, dx=1)
 
 
-def butter_highpass(filtcut, fs, order=2):
+def butter_highpass(filtcut, fs, order=2) -> any:
     nyq = 0.5 * fs
     norm_cutoff = filtcut / nyq
     filtb, filta = signal.butter(order, norm_cutoff, btype='high')
     return filtb, filta
 
 
-def butter_highpass_filter(sig, filtcut, fs, order=2):
+def butter_highpass_filter(sig, filtcut, fs, order=2) -> any:
     global fdata
     filtb, filta = butter_highpass(filtcut, fs, order)
     fdata = signal.filtfilt(filtb, filta, sig)
     return fdata
 
 
-def record_audio() -> any:
+def record_audio() -> bool:
     fs = 44100
     duration = 25  # seconds
     my_recording = sd.rec(duration * fs, samplerate=fs, channels=1, dtype=np.int16)
@@ -173,5 +173,20 @@ def record_audio() -> any:
     plt.ylabel("Amplitude")
     plt.savefig("envelope.png")
     # if the images were saved return true else false
-    return True
+
+    plt.figure(figsize=(12, 8))
+    plt.plot(envelope_x_med_filter, envelope_y_med_filter, '', lw=3)
+    plt.title("Medfilt graph")
+    plt.xlabel("Time")
+    plt.ylabel("Amplitude")
+    plt.savefig("med_filter.png")
+
+    # Calculate area under envelope
+    area = area_under_plot(envelope_y_med_filter)
+
+    voided_volume = 500 * area / 221996
+    urine_flow_rate = voided_volume / duration
+    _usg = 1 / voided_volume
+
+    return duration, voided_volume, urine_flow_rate, _usg
 

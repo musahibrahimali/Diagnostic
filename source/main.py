@@ -1,13 +1,41 @@
 import sys
 import os
+import time
+from time import sleep
+from threading import Thread
 
+import PySide6.QtQuick
 # IMPORT MODULES
 from PySide6.QtGui import QGuiApplication, QIcon
 from PySide6.QtQml import QQmlApplicationEngine
-from PySide6.QtCore import QObject, Slot, Signal
+from PySide6.QtCore import QObject, Slot, Signal, QThread
 from utils import database
 from utils import voice_recorder
 from tensorflow.keras.models import load_model
+
+duration = 0.0
+
+
+# create a worker class
+class Worker(QObject):
+    finished = Signal()
+    progress = Signal(int)
+
+    def run(self):
+        self._running = True
+        while self._running:
+            # do stuff
+            time.sleep(1)
+            self.progress.emit(1)
+        self.finished.emit()
+
+    # terminate the worker
+    def terminate(self):
+        self._running = False
+
+    # stop the worker
+    def stop(self):
+        self.terminate()
 
 
 # create the options window
@@ -59,6 +87,18 @@ class MainWindow(QObject):
     signalRecord = Signal(bool)
     signalStop = Signal(bool)
 
+    # create a worker to record audio
+    def record(self):
+        self.signalRecord.emit(True)
+
+    def record_audio(self):
+        self.duration, self.voided_volume, self.urine_flow_rate, self._usg = voice_recorder.record_audio()
+        if os.path.exists("./rec.wav"):
+            # replace the duration property of the main.qml file
+
+            self.signalRecord.emit(False)
+        return self.duration, self.voided_volume, self.urine_flow_rate, self._usg
+
     signalProceed = Signal(bool)
     signalSubmit = Signal(bool)
 
@@ -71,14 +111,12 @@ class MainWindow(QObject):
             self.patientSignal.emit("Patient")
             # send patient clinician signal
             self.signalChoice.emit(True)
-            # print(f"Patient passed! {getPatientClinician}, isClinician {self.isClinician}")
         elif self.staticClinician.lower() == getPatientClinician.lower():
             self.isClinician = True
             # send clinician signal
             self.clinicianSignal.emit("Clinician")
             # send patient clinician signal
             self.signalChoice.emit(True)
-            # print(f"Clinician passed! {getPatientClinician}, isClinician {self.isClinician}")
         else:
             self.onSignalChoice.emit(False)
             # print("Patient/Clinician error!")
@@ -91,16 +129,13 @@ class MainWindow(QObject):
             self.optLoginSignal.emit("Login")
             # send login register signal
             self.signalLoginRegister.emit(True)
-            # print(f"Login pressed! {getLoginRegister}")
         elif self.staticOptRegister.lower() == getLoginRegister.lower():
             # send register signal
             self.optRegisterSignal.emit("Register")
             # send login register signal
             self.signalLoginRegister.emit(False)
-            # print(f"Register pressed! {getLoginRegister}")
         else:
-            pass
-            # print("Login/Register error!")
+            print("Login/Register error!")
 
     # Function To Check Login
     @Slot(str, str)
@@ -147,14 +182,9 @@ class MainWindow(QObject):
     @Slot(str)
     def recordStopDeletePlay(self, getRecordStopDeletePlay):
         if self.staticRecord.lower() == getRecordStopDeletePlay.lower():
-            # send record signal
             self.recordSignal.emit("Record")
-            # send record signal
             self.signalRecord.emit(True)
-            # record audio
-            _isRecorded = voice_recorder.record_audio()
-            if os.path.exists("./rec.wav"):
-                self.signalRecord.emit(False)
+            self.record_audio()
             print(f"Record pressed! {getRecordStopDeletePlay}")
         elif self.staticStop.lower() == getRecordStopDeletePlay.lower():
             # send stop signal
