@@ -33,6 +33,16 @@ class MainWindow(QMainWindow):
         # set window icon
         self.setWindowIcon(QIcon("./images/logo.png"))
 
+        # set thw window style
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #ffffff;
+            }
+            #ContentBox {
+                color: #ffffff;
+            }
+        """)
+
         # hide the progress bar box and the content box and its content
         self.ui.ProgressBarBox.hide()
         self.ui.ContentBox.hide()
@@ -54,11 +64,11 @@ class MainWindow(QMainWindow):
             # set the duration text
             self.ui.DurationText.setText(f"{str(self.duration)}")
             # set the voided volume text
-            self.ui.VolumeText.setText(f"{str(self.voided_volume)}")
+            self.ui.VolumeText.setText(f"{str(round(self.urine_flow_rate, 4))}")  # str(self.voided_volume)
             # set the urine flow rate text
-            self.ui.FlowRateText.setText(f"{str(self.urine_flow_rate)}")
+            self.ui.FlowRateText.setText(f"{str(round(self.urine_flow_rate, 4))}")
             # set the usg text
-            self.ui.UsgText.setText(f"{str(self._usg)}")
+            self.ui.UsgText.setText(f"{str(round(self._usg, 4))}")
 
             # resize the FirstGraph to fit the image
             self.ui.FirstGraph.resize(400, 400)
@@ -119,6 +129,53 @@ class QuestionsScreen(QMainWindow):
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set window icon
         self.setWindowIcon(QIcon("./images/logo.png"))
+
+        # set window styles
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #EEF1FF;
+                color: #fff;
+            }
+            #ResultBox {
+                color: #fff;
+            }
+            # QuestionOneLabel {
+                color: #fff;
+            }
+            # QuestionTwoLabel {
+                color: #fff;
+            }
+            # QuestionThreeLabel {
+                color: #fff;
+            }
+            #QuestionOneHigh {
+                color: #fff;
+            }
+            #QuestionOneMedium {
+                color: #fff;
+            }
+            #QuestionOneLow {
+                color: #fff;
+            }
+            #QuestionTwoHigh {
+                color: #fff;
+            }
+            #QuestionTwoMedium {
+                color: #fff;
+            }
+            #QuestionTwoLow {
+                color: #fff;
+            }
+            #QuestionThreeHigh {
+                color: #fff;
+            }
+            #QuestionThreeMedium {
+                color: #fff;
+            }
+            #QuestionThreeLow {
+                color: #fff;
+            }
+        """)
 
         # connect the buttons (Questions one)
         self.ui.QuestionOneHigh.stateChanged.connect(self.question_one_high)
@@ -233,17 +290,33 @@ class ResultsScreen(QMainWindow):
         self.ui = Ui_Results()
         self.ui.setupUi(self)
         # resize the window
-        self.resize(700, 450)
+        # self.resize(700, 450)
         # set the data to the resultbox
         self.ui.ResultBox.setText(data)
         # enable word wrap for ResultBox
         self.ui.ResultBox.setWordWrap(True)
+        # add the image to the resultImage label
+        self.ui.ResultImage.setPixmap(QPixmap("./images/result_image.jpg"))
+        # Allow the image to cover the label
+        self.ui.label.setScaledContents(True)
         self.show()
 
         # set window title
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set window icon
         self.setWindowIcon(QIcon("./images/logo.png"))
+
+        # set window styles
+        self.setStyleSheet("""
+            #centralwidget {
+                background-color: #EEF1FF;
+                color: #fff;
+            }
+            #ResultBox {
+                color: #212121;
+                font-size: 20px;
+            }
+        """)
 
         # connect the buttons
         self.ui.CloseButton.clicked.connect(self.home)
@@ -263,9 +336,24 @@ class PatientOrClinicianScreen(QMainWindow):
         super(PatientOrClinicianScreen, self).__init__()
         self.ui = Ui_PatientClinician()
         self.ui.setupUi(self)
-        # make the window frameless
-        self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
 
+        # set the window title
+        self.setWindowTitle("JIJ DIAGNOSTICS")
+        # set the window icon
+        self.setWindowIcon(QIcon("./images/logo.png"))
+
+        # add a border radius to the window
+        self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
+
+        # set window styles
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color:  qlineargradient(
+                    spread:pad, x1:0, y1:0.5, x2:1, y2:0.466, stop:0 rgba(9, 27, 27, 255), stop:1 rgba(85, 255, 255, 255)
+                );
+                color: #fff;
+            }
+        """)
         # connect the buttons
         self.ui.PatientButton.clicked.connect(self.action)
         self.ui.ClinicianButton.clicked.connect(self.action)
@@ -287,6 +375,17 @@ class LoginOrRegisterScreen(QMainWindow):
         self.ui.setupUi(self)
         # make the window frameless
         self.setWindowFlags(QtCore.Qt.FramelessWindowHint)
+        # make sure window cannot be resized
+        self.setFixedSize(self.size())
+
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color:  qlineargradient(
+                    spread:pad, x1:0, y1:0.5, x2:1, y2:0.466, stop:0 rgba(85, 255, 255, 255), stop:1 rgba(9, 27, 27, 255)
+                );
+                color: #fff;
+            }
+        """)
 
         # connect the buttons
         self.ui.LoginButton.clicked.connect(self.loginOption)
@@ -317,6 +416,27 @@ class LoginScreen(QMainWindow):
 
         # make sure window cannot be resized
         self.setFixedSize(self.size())
+        # set window title
+        self.setWindowTitle("JIJ DIAGNOSTICS")
+        # set window icon
+        self.setWindowIcon(QIcon("./images/logo.png"))
+
+        self.ui.label.setPixmap(QPixmap("./images/login_image.jpg"))
+        # Allow the image to cover the label
+        self.ui.label.setScaledContents(True)
+        # set window styles
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1a2127;
+                color: #fff;
+            }
+            #EmailLabel {
+                color: #fff;
+            }
+            #PasswordLabel {
+                color: #fff;
+            }
+        """)
 
         # connect the buttons
         self.ui.LoginButton.clicked.connect(self.login)
@@ -370,6 +490,27 @@ class RegisterScreen(QMainWindow):
         self.ui.setupUi(self)
         # make sure window cannot be resized
         self.setFixedSize(self.size())
+        # set thw window title
+        self.setWindowTitle("JIJ DIAGNOSTICS")
+        # set the window icon
+        self.setWindowIcon(QIcon("./images/logo.png"))
+
+        # set window styles
+        self.setStyleSheet("""
+            QMainWindow {
+                background-color: #1a2127;
+                color: #fff;
+            }
+            #NameLabel {
+                color: #fff;
+            }
+            #EmailLabel {
+                color: #fff;
+            }
+            #PasswordLabel {
+                color: #fff;
+            }
+        """)
 
         # connect the buttons
         self.ui.RegisterButton.clicked.connect(self.register)
@@ -389,7 +530,8 @@ class RegisterScreen(QMainWindow):
         self.db = database.DatabaseHandler()  # type: database.DatabaseHandler
         self.db.create_table()  # create database table
         # print(f" name : {self.name}, Email: {self.email}, Password : {self.password}")
-        if self.name != "" and "@" in self.email and ".com" in self.email and self.password != "" and self.db.check_login(self.email) is None:
+        if self.name != "" and "@" in self.email and ".com" in self.email and self.password != "" and self.db.check_login(
+                self.email) is None:
             # register the user
             user = self.db.register_user(self.name, self.email, self.password)
             if user:
@@ -457,6 +599,7 @@ class SplashScreen(QWidget):
                     QFrame {
                         background-color: #1a2127;
                         color: rgb(220, 220, 220);
+                        border-radius: 10px;
                     }
 
                     QProgressBar {
