@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QLabel, QLineEdit,
                                QStatusBar, QWidget)
 
 
-class Ui_MainWindow(object):
+class Ui_Register(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")

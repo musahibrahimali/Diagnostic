@@ -29,6 +29,12 @@ class DatabaseHandler(QObject):
         except sqlite3.IntegrityError:
             return False
 
+    # check login
+    def check_login(self, email: str):
+        self.cursor.execute("SELECT * FROM users WHERE email = ?", (email,))
+        user = self.cursor.fetchone()
+        return user
+
     # login user
     def login_user(self, email: str, password: str):
         self.cursor.execute("SELECT * FROM users WHERE email = ? AND password = ?", (email, password))

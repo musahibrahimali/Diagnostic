@@ -1,11 +1,11 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-# Form generated from reading UI file 'loginmShMth.ui'
+## Form generated from reading UI file 'loginienfIn.ui'
 ##
-# Created by: Qt User Interface Compiler version 6.3.1
+## Created by: Qt User Interface Compiler version 6.3.1
 ##
-# WARNING! All changes made in this file will be lost when recompiling UI file!
+## WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
 from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
@@ -20,7 +20,7 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QLabel, QLineEdit,
                                QStatusBar, QWidget)
 
 
-class Ui_MainWindow(object):
+class Ui_Login(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
@@ -33,35 +33,25 @@ class Ui_MainWindow(object):
         self.gridLayout = QGridLayout(self.layoutWidget)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
-        self.EmailTextField = QLineEdit(self.layoutWidget)
-        self.EmailTextField.setObjectName(u"EmailTextField")
+        self.PasswordLabel = QLabel(self.layoutWidget)
+        self.PasswordLabel.setObjectName(u"PasswordLabel")
 
-        self.gridLayout.addWidget(self.EmailTextField, 1, 1, 1, 1)
+        self.gridLayout.addWidget(self.PasswordLabel, 1, 0, 1, 1)
 
         self.EmailLabel = QLabel(self.layoutWidget)
         self.EmailLabel.setObjectName(u"EmailLabel")
 
-        self.gridLayout.addWidget(self.EmailLabel, 1, 0, 1, 1)
+        self.gridLayout.addWidget(self.EmailLabel, 0, 0, 1, 1)
+
+        self.EmailTextField = QLineEdit(self.layoutWidget)
+        self.EmailTextField.setObjectName(u"EmailTextField")
+
+        self.gridLayout.addWidget(self.EmailTextField, 0, 1, 1, 1)
 
         self.PasswordTextField = QLineEdit(self.layoutWidget)
         self.PasswordTextField.setObjectName(u"PasswordTextField")
 
-        self.gridLayout.addWidget(self.PasswordTextField, 2, 1, 1, 1)
-
-        self.PasswordLabel = QLabel(self.layoutWidget)
-        self.PasswordLabel.setObjectName(u"PasswordLabel")
-
-        self.gridLayout.addWidget(self.PasswordLabel, 2, 0, 1, 1)
-
-        self.NameLabel = QLabel(self.layoutWidget)
-        self.NameLabel.setObjectName(u"NameLabel")
-
-        self.gridLayout.addWidget(self.NameLabel, 0, 0, 1, 1)
-
-        self.NameTextField = QLineEdit(self.layoutWidget)
-        self.NameTextField.setObjectName(u"NameTextField")
-
-        self.gridLayout.addWidget(self.NameTextField, 0, 1, 1, 1)
+        self.gridLayout.addWidget(self.PasswordTextField, 1, 1, 1, 1)
 
         self.layoutWidget1 = QWidget(self.centralwidget)
         self.layoutWidget1.setObjectName(u"layoutWidget1")
@@ -96,9 +86,8 @@ class Ui_MainWindow(object):
 
     def retranslateUi(self, MainWindow):
         MainWindow.setWindowTitle(QCoreApplication.translate("MainWindow", u"MainWindow", None))
-        self.EmailLabel.setText(QCoreApplication.translate("MainWindow", u"Email", None))
         self.PasswordLabel.setText(QCoreApplication.translate("MainWindow", u"Password", None))
-        self.NameLabel.setText(QCoreApplication.translate("MainWindow", u"Name", None))
+        self.EmailLabel.setText(QCoreApplication.translate("MainWindow", u"Email", None))
         self.RegisterButton.setText(QCoreApplication.translate("MainWindow", u"REGISTER", None))
         self.LoginButton.setText(QCoreApplication.translate("MainWindow", u"LOGIN", None))
     # retranslateUi

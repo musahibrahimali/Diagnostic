@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-# Form generated from reading UI file 'login_register_optionhMwODs.ui'
+# Form generated from reading UI file 'login_register_optionkPAefx.ui'
 ##
 # Created by: Qt User Interface Compiler version 6.3.1
 ##
@@ -19,25 +19,25 @@ from PySide6.QtWidgets import (QApplication, QGridLayout, QMainWindow, QMenuBar,
                                QPushButton, QSizePolicy, QStatusBar, QWidget)
 
 
-class Ui_MainWindow(object):
+class Ui_LoginRegister(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
         MainWindow.resize(421, 368)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.widget = QWidget(self.centralwidget)
-        self.widget.setObjectName(u"widget")
-        self.widget.setGeometry(QRect(50, 120, 301, 111))
-        self.LoginRegisterBox = QGridLayout(self.widget)
+        self.layoutWidget = QWidget(self.centralwidget)
+        self.layoutWidget.setObjectName(u"layoutWidget")
+        self.layoutWidget.setGeometry(QRect(50, 120, 301, 111))
+        self.LoginRegisterBox = QGridLayout(self.layoutWidget)
         self.LoginRegisterBox.setObjectName(u"LoginRegisterBox")
         self.LoginRegisterBox.setContentsMargins(0, 0, 0, 0)
-        self.RegisterButton = QPushButton(self.widget)
+        self.RegisterButton = QPushButton(self.layoutWidget)
         self.RegisterButton.setObjectName(u"RegisterButton")
 
         self.LoginRegisterBox.addWidget(self.RegisterButton, 1, 0, 1, 1)
 
-        self.LoginButton = QPushButton(self.widget)
+        self.LoginButton = QPushButton(self.layoutWidget)
         self.LoginButton.setObjectName(u"LoginButton")
 
         self.LoginRegisterBox.addWidget(self.LoginButton, 0, 0, 1, 1)
