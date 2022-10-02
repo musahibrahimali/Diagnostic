@@ -1,38 +1,45 @@
 # -*- coding: utf-8 -*-
 
 ################################################################################
-# Form generated from reading UI file 'main_windowVCYyLe.ui'
+# Form generated from reading UI file 'main_windowZcQXGX.ui'
 ##
 # Created by: Qt User Interface Compiler version 6.3.1
 ##
 # WARNING! All changes made in this file will be lost when recompiling UI file!
 ################################################################################
 
-from PySide6.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
+from PySide2.QtCore import (QCoreApplication, QDate, QDateTime, QLocale,
                             QMetaObject, QObject, QPoint, QRect,
                             QSize, QTime, QUrl, Qt)
-from PySide6.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
+from PySide2.QtGui import (QBrush, QColor, QConicalGradient, QCursor,
                            QFont, QFontDatabase, QGradient, QIcon,
                            QImage, QKeySequence, QLinearGradient, QPainter,
                            QPalette, QPixmap, QRadialGradient, QTransform)
-from PySide6.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
+from PySide2.QtWidgets import (QApplication, QGridLayout, QHBoxLayout, QLabel,
                                QMainWindow, QMenuBar, QProgressBar, QPushButton,
-                               QSizePolicy, QStatusBar, QWidget)
+                               QScrollArea, QSizePolicy, QStatusBar, QWidget)
 
 
 class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         if not MainWindow.objectName():
             MainWindow.setObjectName(u"MainWindow")
-        MainWindow.resize(944, 616)
+        MainWindow.resize(404, 417)
         self.centralwidget = QWidget(MainWindow)
         self.centralwidget.setObjectName(u"centralwidget")
-        self.RecordStopBox = QWidget(self.centralwidget)
+        self.scrollArea = QScrollArea(self.centralwidget)
+        self.scrollArea.setObjectName(u"scrollArea")
+        self.scrollArea.setGeometry(QRect(9, 9, 381, 361))
+        self.scrollArea.setWidgetResizable(True)
+        self.scrollAreaWidgetContents = QWidget()
+        self.scrollAreaWidgetContents.setObjectName(u"scrollAreaWidgetContents")
+        self.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 379, 359))
+        self.RecordStopBox = QWidget(self.scrollAreaWidgetContents)
         self.RecordStopBox.setObjectName(u"RecordStopBox")
-        self.RecordStopBox.setGeometry(QRect(170, 10, 551, 61))
+        self.RecordStopBox.setGeometry(QRect(110, 0, 171, 51))
         self.layoutWidget = QWidget(self.RecordStopBox)
         self.layoutWidget.setObjectName(u"layoutWidget")
-        self.layoutWidget.setGeometry(QRect(30, 20, 501, 26))
+        self.layoutWidget.setGeometry(QRect(10, 10, 158, 26))
         self.horizontalLayout = QHBoxLayout(self.layoutWidget)
         self.horizontalLayout.setObjectName(u"horizontalLayout")
         self.horizontalLayout.setContentsMargins(0, 0, 0, 0)
@@ -46,15 +53,22 @@ class Ui_MainWindow(object):
 
         self.horizontalLayout.addWidget(self.StopButton)
 
-        self.ContentBox = QWidget(self.centralwidget)
+        self.ProgressBarBox = QWidget(self.scrollAreaWidgetContents)
+        self.ProgressBarBox.setObjectName(u"ProgressBarBox")
+        self.ProgressBarBox.setGeometry(QRect(110, 60, 161, 41))
+        self.progressBar = QProgressBar(self.ProgressBarBox)
+        self.progressBar.setObjectName(u"progressBar")
+        self.progressBar.setGeometry(QRect(10, 10, 151, 23))
+        self.progressBar.setValue(24)
+        self.ContentBox = QWidget(self.scrollAreaWidgetContents)
         self.ContentBox.setObjectName(u"ContentBox")
-        self.ContentBox.setGeometry(QRect(60, 140, 841, 431))
+        self.ContentBox.setGeometry(QRect(20, 100, 351, 251))
         self.ProceedButton = QPushButton(self.ContentBox)
         self.ProceedButton.setObjectName(u"ProceedButton")
-        self.ProceedButton.setGeometry(QRect(220, 370, 351, 51))
+        self.ProceedButton.setGeometry(QRect(110, 210, 101, 31))
         self.layoutWidget1 = QWidget(self.ContentBox)
         self.layoutWidget1.setObjectName(u"layoutWidget1")
-        self.layoutWidget1.setGeometry(QRect(10, 10, 821, 261))
+        self.layoutWidget1.setGeometry(QRect(20, 10, 291, 131))
         self.gridLayout = QGridLayout(self.layoutWidget1)
         self.gridLayout.setObjectName(u"gridLayout")
         self.gridLayout.setContentsMargins(0, 0, 0, 0)
@@ -70,7 +84,7 @@ class Ui_MainWindow(object):
 
         self.layoutWidget2 = QWidget(self.ContentBox)
         self.layoutWidget2.setObjectName(u"layoutWidget2")
-        self.layoutWidget2.setGeometry(QRect(10, 300, 821, 41))
+        self.layoutWidget2.setGeometry(QRect(10, 160, 331, 41))
         self.gridLayout_2 = QGridLayout(self.layoutWidget2)
         self.gridLayout_2.setObjectName(u"gridLayout_2")
         self.gridLayout_2.setContentsMargins(0, 0, 0, 0)
@@ -114,17 +128,11 @@ class Ui_MainWindow(object):
 
         self.gridLayout_2.addWidget(self.UsgText, 1, 3, 1, 1)
 
-        self.ProgressBarBox = QWidget(self.centralwidget)
-        self.ProgressBarBox.setObjectName(u"ProgressBarBox")
-        self.ProgressBarBox.setGeometry(QRect(210, 80, 451, 41))
-        self.progressBar = QProgressBar(self.ProgressBarBox)
-        self.progressBar.setObjectName(u"progressBar")
-        self.progressBar.setGeometry(QRect(10, 10, 431, 23))
-        self.progressBar.setValue(24)
+        self.scrollArea.setWidget(self.scrollAreaWidgetContents)
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QMenuBar(MainWindow)
         self.menubar.setObjectName(u"menubar")
-        self.menubar.setGeometry(QRect(0, 0, 944, 22))
+        self.menubar.setGeometry(QRect(0, 0, 404, 22))
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QStatusBar(MainWindow)
         self.statusbar.setObjectName(u"statusbar")

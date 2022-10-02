@@ -1,5 +1,5 @@
 import sqlite3
-from PySide6.QtCore import QObject
+from PySide2.QtCore import QObject
 
 
 # database handler class

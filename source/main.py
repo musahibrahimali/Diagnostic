@@ -9,12 +9,12 @@ from patient_clinician_option import Ui_PatientClinician
 from register_ui import Ui_Register
 from login_ui import Ui_Login
 from login_register_option import Ui_LoginRegister
-from PySide6.QtCore import *
-from PySide6.QtGui import *
-from PySide6.QtWidgets import *
+from PySide2.QtCore import *
+from PySide2.QtGui import *
+from PySide2.QtWidgets import *
 from utils import database
 from utils import voice_recorder
-import PySide6.QtCore as QtCore
+import PySide2.QtCore as QtCore
 
 
 class MainWindow(QMainWindow):
@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.isClinician = False
         # resize the window
-        self.resize(800, 200)
+        self.resize(480, 320)
         self.show()
 
         # set window title
@@ -38,6 +38,9 @@ class MainWindow(QMainWindow):
             QMainWindow {
                 background-color: #ffffff;
             }
+            #scrollAreaWidgetContents{
+                background-color: #ffffff;
+            }
             #ContentBox {
                 color: #ffffff;
             }
@@ -46,6 +49,15 @@ class MainWindow(QMainWindow):
         # hide the progress bar box and the content box and its content
         self.ui.ProgressBarBox.hide()
         self.ui.ContentBox.hide()
+
+        self.ui.scrollArea.setVerticalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setWidgetResizable(False)
+        self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
+        self.setCentralWidget(self.ui.scrollArea)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
 
         # connect the buttons
         self.ui.RecordButton.clicked.connect(self.record)
@@ -62,17 +74,17 @@ class MainWindow(QMainWindow):
         self.animate()
         if os.path.exists("./rec.wav"):
             # set the duration text
-            self.ui.DurationText.setText(f"{str(self.duration)}")
+            self.ui.DurationText.setText(f"{str(self.duration)} s")
             # set the voided volume text
-            self.ui.VolumeText.setText(f"{str(round(self.urine_flow_rate, 4))}")  # str(self.voided_volume)
+            self.ui.VolumeText.setText(f"{str(round(self.urine_flow_rate, 4))} ml")  # str(self.voided_volume)
             # set the urine flow rate text
-            self.ui.FlowRateText.setText(f"{str(round(self.urine_flow_rate, 4))}")
+            self.ui.FlowRateText.setText(f"{str(round(self.urine_flow_rate, 4))} ml/s")
             # set the usg text
             self.ui.UsgText.setText(f"{str(round(self._usg, 4))}")
 
             # resize the FirstGraph to fit the image
-            self.ui.FirstGraph.resize(400, 400)
-            self.ui.SecondGraph.resize(400, 400)
+            self.ui.FirstGraph.resize(200, 200)
+            self.ui.SecondGraph.resize(200, 200)
 
             # set the first graph and the last graph
             self.ui.FirstGraph.setPixmap(QPixmap("sound_wave.png"))
@@ -97,7 +109,7 @@ class MainWindow(QMainWindow):
             # show the content box and its content
             self.ui.ContentBox.show()
             # resize the window
-            self.resize(1000, 700)
+            self.resize(480, 320)
 
     # stop the recording
     def stop(self):
@@ -108,7 +120,7 @@ class MainWindow(QMainWindow):
 
     # proceed to the next window
     def proceed(self):
-        self.myApp = QuestionsScreen()
+        self.myApp = QuestionsScreen(self.urine_flow_rate)
         # close the main window
         self.close()
         self.myApp.show()
@@ -117,18 +129,17 @@ class MainWindow(QMainWindow):
 # create the questions screen
 class QuestionsScreen(QMainWindow):
     # setup the questions screen
-    def __init__(self):
+    def __init__(self, flow_rate):
         super(QuestionsScreen, self).__init__()
         self.ui = Ui_Questions()
         self.ui.setupUi(self)
-        # resize the window
-        self.resize(700, 450)
+        self.flow_rate = flow_rate
         self.show()
 
         # set window title
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set window icon
-        self.setWindowIcon(QIcon("./images/logo.png"))
+        self.setWindowIcon(QIcon("C:\\Users\\Administrator\\Desktop\\Diagnostic\\source\\graphics\\logo.png"))
 
         # set window styles
         self.setStyleSheet("""
@@ -137,6 +148,10 @@ class QuestionsScreen(QMainWindow):
                 color: #fff;
             }
             #ResultBox {
+                color: #fff;
+            }
+            #scrollAreaWidgetContents{
+                background-color: #EEF1FF;
                 color: #fff;
             }
             # QuestionOneLabel {
@@ -177,6 +192,20 @@ class QuestionsScreen(QMainWindow):
             }
         """)
 
+        self.ui.scrollArea.setVerticalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setWidgetResizable(False)
+        self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
+        self.setCentralWidget(self.ui.scrollArea)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
+
+        # scroll content along when vertical scroll bar is moved
+        self.ui.scrollArea.verticalScrollBar().valueChanged.connect(self.scroll_content)
+        # scroll content along when horizontal scroll bar is moved
+        self.ui.scrollArea.horizontalScrollBar().valueChanged.connect(self.scroll_content)
+
         # connect the buttons (Questions one)
         self.ui.QuestionOneHigh.stateChanged.connect(self.question_one_high)
         self.ui.QuestionOneLow.stateChanged.connect(self.question_one_medium)
@@ -194,6 +223,10 @@ class QuestionsScreen(QMainWindow):
 
         # connect the buttons (submit button)
         self.ui.SubMitButton.clicked.connect(self.submit)
+
+    # scroll the content along when the scroll bar is moved
+    def scroll_content(self):
+        self.ui.scrollAreaWidgetContents.setGeometry(QRect(0, 0, 480, 320))
 
     def question_one_high(self) -> None:
         self.ui.QuestionOneHigh.setChecked(True)
@@ -252,11 +285,14 @@ class QuestionsScreen(QMainWindow):
         self.question_three_medium = self.ui.QuestionThreeMedium.isChecked()
         self.question_three_low = self.ui.QuestionThreeLow.isChecked()
         self.data = ''
+        self.image = "C:\\Users\\Administrator\\Desktop\\Diagnostic\\source\\graphics\\result_image.jpg"
         # if question one is high, two is high and three is high
-        if self.question_one_high and self.question_two_high and self.question_three_high:
+        if self.question_one_high and self.question_two_high and self.question_three_high and self.flow_rate < 10:
+            self.data = "High urgency sometimes indicate a urinary tract infection (UTI) or a problem with the bladder or prostateBase on your result, please visit a doctor as you are at risk on having an obstructed bladder."
+            self.image = "C:\\Users\\Administrator\\Desktop\\Diagnostic\\source\\graphics\\b.jpg"
+        elif self.question_one_high and self.question_two_high and self.question_three_medium and self.question_three_high and self.flow_rate < 15:
             self.data = "Urinary urgency occurs when the pressure in the bladder builds suddenly. You need a doctor’s view on the result to be full diagnosed"
-        elif self.question_one_high and self.question_two_high and self.question_three_medium:
-            self.data = "Urinary urgency occurs when the pressure in the bladder builds suddenly. You need a doctor’s view on the result to be full diagnosed"
+            self.image = "C:\\Users\\Administrator\\Desktop\\Diagnostic\\source\\graphics\\b.jpg"
         elif self.question_one_high and self.question_two_high and self.question_three_low:
             self.data = "Urinary urgency occurs when the pressure in the bladder builds suddenly. You need a doctor’s view on the result to be full diagnosed"
         elif self.question_one_high and self.question_two_medium and self.question_three_high:
@@ -276,7 +312,7 @@ class QuestionsScreen(QMainWindow):
         else:
             self.data = "Some sample data from the database"
         # show the results screen
-        self.myApp = ResultsScreen(data=self.data)
+        self.myApp = ResultsScreen(data=self.data, image=self.image)
         # close the questions screen
         self.close()
         self.myApp.show()
@@ -285,7 +321,7 @@ class QuestionsScreen(QMainWindow):
 # results screen
 class ResultsScreen(QMainWindow):
     # setup the results screen
-    def __init__(self, data: str):
+    def __init__(self, data: str, image: str):
         super(ResultsScreen, self).__init__()
         self.ui = Ui_Results()
         self.ui.setupUi(self)
@@ -296,7 +332,7 @@ class ResultsScreen(QMainWindow):
         # enable word wrap for ResultBox
         self.ui.ResultBox.setWordWrap(True)
         # add the image to the resultImage label
-        self.ui.ResultImage.setPixmap(QPixmap("./images/result_image.jpg"))
+        self.ui.ResultImageBox.setPixmap(QPixmap(image))
         # Allow the image to cover the label
         self.ui.label.setScaledContents(True)
         self.show()
@@ -304,7 +340,7 @@ class ResultsScreen(QMainWindow):
         # set window title
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set window icon
-        self.setWindowIcon(QIcon("./images/logo.png"))
+        self.setWindowIcon(QIcon("./graphics/logo.png"))
 
         # set window styles
         self.setStyleSheet("""
@@ -316,10 +352,22 @@ class ResultsScreen(QMainWindow):
                 color: #212121;
                 font-size: 20px;
             }
+            #scrollAreaWidgetContents{
+                background-color: #EEF1FF;
+                color: #fff;
+            }
         """)
 
         # connect the buttons
         self.ui.CloseButton.clicked.connect(self.home)
+        self.ui.scrollArea.setVerticalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setWidgetResizable(False)
+        self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
+        self.setCentralWidget(self.ui.scrollArea)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
 
     # go to the home screen
     def home(self):
@@ -340,7 +388,7 @@ class PatientOrClinicianScreen(QMainWindow):
         # set the window title
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set the window icon
-        self.setWindowIcon(QIcon("./images/logo.png"))
+        self.setWindowIcon(QIcon("graphics/logo.png"))
 
         # add a border radius to the window
         self.setWindowFlag(QtCore.Qt.FramelessWindowHint)
@@ -415,18 +463,18 @@ class LoginScreen(QMainWindow):
         self.ui.setupUi(self)
 
         # make sure window cannot be resized
-        self.setFixedSize(self.size())
+        # self.setFixedSize(self.size())
         # set window title
         self.setWindowTitle("JIJ DIAGNOSTICS")
         # set window icon
-        self.setWindowIcon(QIcon("./images/logo.png"))
+        self.setWindowIcon(QIcon("C:\\Users\\Administrator\\Desktop\\Diagnostic\\source\\graphics\\logo.png"))
 
-        self.ui.label.setPixmap(QPixmap("./images/login_image.jpg"))
-        # Allow the image to cover the label
-        self.ui.label.setScaledContents(True)
-        # set window styles
         self.setStyleSheet("""
             QMainWindow {
+                background-color: #1a2127;
+                color: #fff;
+            }
+            #scrollAreaWidgetContents{
                 background-color: #1a2127;
                 color: #fff;
             }
@@ -441,6 +489,16 @@ class LoginScreen(QMainWindow):
         # connect the buttons
         self.ui.LoginButton.clicked.connect(self.login)
         self.ui.RegisterButton.clicked.connect(self.register)
+
+        # make the scroll widget scrollable
+        self.ui.scrollArea.setVerticalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setWidgetResizable(False)
+        self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
+        self.setCentralWidget(self.ui.scrollArea)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
 
         # obscure the password
         self.ui.PasswordTextField.setEchoMode(QLineEdit.Password)
@@ -501,6 +559,10 @@ class RegisterScreen(QMainWindow):
                 background-color: #1a2127;
                 color: #fff;
             }
+            #scrollAreaWidgetContents{
+                background-color: #1a2127;
+                color: #fff;
+            }
             #NameLabel {
                 color: #fff;
             }
@@ -511,6 +573,15 @@ class RegisterScreen(QMainWindow):
                 color: #fff;
             }
         """)
+
+        self.ui.scrollArea.setVerticalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBar(QScrollBar())
+        self.ui.scrollArea.setHorizontalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setVerticalScrollBarPolicy(QtCore.Qt.ScrollBarAlwaysOn)
+        self.ui.scrollArea.setWidgetResizable(False)
+        self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
+        self.setCentralWidget(self.ui.scrollArea)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
 
         # connect the buttons
         self.ui.RegisterButton.clicked.connect(self.register)
@@ -585,7 +656,6 @@ class SplashScreen(QWidget):
                         font-size: 60px;
                         color:#55ffff;
                     }
-
                     #LabelDesc {
                         font-size: 30px;
                         color: #c2ced1;
@@ -668,6 +738,6 @@ if __name__ == "__main__":
     splash.show()
 
     try:
-        sys.exit(app.exec())
+        sys.exit(app.exec_())
     except SystemExit:
         pass
