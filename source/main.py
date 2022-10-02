@@ -25,7 +25,7 @@ class MainWindow(QMainWindow):
         self.ui.setupUi(self)
         self.isClinician = False
         # resize the window
-        self.resize(480, 320)
+        # self.resize(480, 320)
         self.show()
 
         # set window title
@@ -57,7 +57,7 @@ class MainWindow(QMainWindow):
         self.ui.scrollArea.setWidgetResizable(False)
         self.ui.scrollArea.ensureWidgetVisible(self.ui.scrollAreaWidgetContents)
         self.setCentralWidget(self.ui.scrollArea)
-        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 480, 320)
+        self.ui.scrollAreaWidgetContents.setGeometry(0, 0, 450, 450)
 
         # connect the buttons
         self.ui.RecordButton.clicked.connect(self.record)
